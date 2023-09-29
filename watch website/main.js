@@ -4,6 +4,10 @@ console.log("connected");
 let cartIcon = document.querySelector("#cart-icon");
 let cart = document.querySelector(".cart");
 let closeCart = document.querySelector("#close-cart");
+let addCart = document.querySelector("#add-cart"); 
+var title = document.querySelector(".product-title"); //added for checking
+var price = document.querySelector(".price");
+var prodcutImg = document.querySelector(".prodcut-img");
 
 //open cart
 cartIcon.onclick = () => {
@@ -15,6 +19,12 @@ cartIcon.onclick = () => {
 closeCart.onclick = () => {
     cart.classList.remove("active");
 };
+
+if (document.readyState == "loading") {
+    document.addEventListener("DOMContentLoaded", ready);
+  } else {
+    ready();
+  }
 
 //making function
 function ready() {
@@ -38,13 +48,66 @@ function ready() {
         var button = addCart[i];
         button.addEventListener("click", addCartClicked);
     }
+//Buy button Work
+document.getElementsByClassName('btn-buy')[0].addEventListener('click',buyButtonClicked);
 }
 
-//removing items from cart
+//Buy button 
+function buyButtonClicked(){
+    alert('Your order is placed')
+    var cartContent =document.getElementsByClassName('cart-content')[0]
+    while(cartContent.hasChildNodes()){
+      cartContent.removeChild(cartContent.firstChild);
+    }
+  updatetotal();
+  }
+  
+
+//removing items from cart 
 function removeCartItem(event) {
     var buttonClicked = event.target;
     buttonClicked.parentElement.remove();
     updatetotal();
+}
+
+//Add to cart
+function addCartClicked(event){
+    var button= event.target
+    var shopProducts = button.parentElement
+    var title =shopProducts.getElementsByClassName('product-title')[0].innerText;
+     var price =
+       shopProducts.getElementsByClassName("price")[0].innerText;
+        var productImg =
+          shopProducts.getElementsByClassName("product-img")[0].src;
+         addProductToCart(title,price,productImg);
+         updatetotal();
+  
+  }
+
+function addProductToCart(title, price, prodcutImg) {
+    var cartShopBox = document.createElement('div');
+    cartShopBox.classList.add("cart-box");
+    var cartItems = document.getElementsByClassName("cart-content")[0];
+    var cartItemsNames = cartItems.getElementsByClassName("cart-product-title");    
+    for (var i = 0; i < cartItemsNames.length; i++) {
+        if (cartItemsNames[i].innerText == title) {
+            alert("You  have already added this item to cart");
+            return;
+        }
+    }
+    var cartBoxContent = 
+                          `<img src="${prodcutImg}" alt="" class="image">
+                          <div class="detail-box">
+                            <h3 class="cart-product-title">${title}</h3>
+                            <div class="price">${price}</div>
+                            <input type="number" value="1" class="cart-quantity">
+                          </div>
+                          <i class='bx bxs-trash-alt cart-remove'></i>`;
+    cartShopBox.innerHTML = cartBoxContent;
+    cartItems.append(cartShopBox)
+    cartShopBox.getElementsByClassName("cart-remove")[0].addEventListener("click", removeCartItem);
+    cartShopBox.getElementsByClassName("cart-quantity")[0].addEventListener("change", quantityChanged);
+    // console.log("entered");
 }
 
 //quantity changes
@@ -56,22 +119,11 @@ function quantityChanged(event) {
     updatetotal();
 }
 
-//Add to cart
-function addCartClicked(event) {
-    var button = event.target;
-    var shopProducts = button.parentElement;
-    var title = shopProducts.getElementsByClassName("product-title")[0].innerText;
-    var price = shopProducts.getElementsByClassName("price")[0].innerText;
-    var prodcutImg = shopProducts.getElementsByClassName("prodcut-img")[0].src;
-    console.log(title, price, prodcutImg);
-    addProductToCart(title, price, prodcutImg);
-    updatetotal();
-}
+addCart.addEventListener("click", addCartClicked);
 
-function addProductToCart(title, price, prodcutImg) {
-    var cartShopBox = document.createElement("div");
-    // cartShopBox.classList.add('cart-box');
-}
+
+
+
 
 
 //update total
@@ -86,15 +138,12 @@ function updatetotal() {
         var price = parseFloat(priceElement.innerText.replace("Rs", " "));
         var quantity = quantityElement.value;
         total = total + (price * quantity);
-        //if price contains some cent value
+    }
+       //if price contains some cent value
         total = Math.round(total * 100) / 100;
 
         document.getElementsByClassName('total-price')[0].innerText = "Rs " + total;
-    }
+    
 }
 
-ready();
-updatetotal();
-quantityChanged();
-// addCart();
-// addCartClicked();
+
